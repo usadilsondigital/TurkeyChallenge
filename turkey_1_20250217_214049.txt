@@ -1,0 +1,8 @@
+{
+    "id": 1,
+    "name": "primero",
+    "status": "offline",
+    "size": 11,
+    "color": "rojo",
+    "gender": "male"
+}
