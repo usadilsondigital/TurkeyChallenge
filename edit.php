@@ -1,13 +1,21 @@
 <?php
-require 'db.php';
-require 'Turkey.php';
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
 
-$turkeyModel = new Turkey($pdo);
-$turkey = $turkeyModel->getTurkey($_GET['id']);
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository);
+
+$turkey = $controller->listTurkeys();
+if (isset($_GET['id'])) {
+    $turkey = $controller->listTurkeys()[array_search($_GET['id'], array_column($controller->listTurkeys(), 'id'))] ?? null;
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $turkeyModel->updateTurkey($_GET['id'], $_POST['name'], $_POST['status'], $_POST['size'], $_POST['color'], $_POST['gender']);
+    $controller->editTurkey($_GET['id'], $_POST['name'], $_POST['status'], $_POST['size'], $_POST['color'], $_POST['gender']);
     header("Location: index.php");
+    exit();
 }
 ?>
 
@@ -29,33 +37,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form method="post">
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-signature"></i> Name</label>
-                    <input type="text" name="name" class="form-control" value="<?= $turkey['name'] ?>" required>
+                    <input type="text" name="name" class="form-control" value="<?= $turkey['name'] ?? '' ?>" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-signal"></i> Status</label>
                     <select name="status" class="form-select">
-                        <option value="online" <?= $turkey['status'] == 'online' ? 'selected' : '' ?>>🟢 Online</option>
-                        <option value="offline" <?= $turkey['status'] == 'offline' ? 'selected' : '' ?>>⚫ Offline</option>
-                        <option value="limbo" <?= $turkey['status'] == 'limbo' ? 'selected' : '' ?>>🟡 Limbo</option>
+                        <option value="online" <?= isset($turkey['status']) && $turkey['status'] == 'online' ? 'selected' : '' ?>>🟢 Online</option>
+                        <option value="offline" <?= isset($turkey['status']) && $turkey['status'] == 'offline' ? 'selected' : '' ?>>⚫ Offline</option>
+                        <option value="limbo" <?= isset($turkey['status']) && $turkey['status'] == 'limbo' ? 'selected' : '' ?>>🟡 Limbo</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-ruler-vertical"></i> Size</label>
-                    <input type="number" name="size" class="form-control" value="<?= $turkey['size'] ?>" required>
+                    <input type="number" name="size" class="form-control" value="<?= $turkey['size'] ?? '' ?>" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-palette"></i> Color</label>
-                    <input type="text" name="color" class="form-control" value="<?= $turkey['color'] ?>">
+                    <input type="text" name="color" class="form-control" value="<?= $turkey['color'] ?? '' ?>">
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label"><i class="fas fa-venus-mars"></i> Gender</label>
                     <select name="gender" class="form-select">
-                        <option value="male" <?= $turkey['gender'] == 'male' ? 'selected' : '' ?>>♂️ Male</option>
-                        <option value="female" <?= $turkey['gender'] == 'female' ? 'selected' : '' ?>>♀️ Female</option>
+                        <option value="male" <?= isset($turkey['gender']) && $turkey['gender'] == 'male' ? 'selected' : '' ?>>♂️ Male</option>
+                        <option value="female" <?= isset($turkey['gender']) && $turkey['gender'] == 'female' ? 'selected' : '' ?>>♀️ Female</option>
                     </select>
                 </div>
 
@@ -69,6 +77,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

@@ -14,7 +14,6 @@ Enable PDO (if not already enabled)
 
 
 Modify Database Credentials If needed
-Update the script (db_connect.php) with your database details:
 $host = "localhost";
 $dbname = "your_database_name";
 $username = "your_username";

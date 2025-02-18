@@ -1,11 +1,23 @@
 <?php
-require 'db.php';
-require 'Turkey.php';
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
 
-$turkeyModel = new Turkey($pdo);
-$turkeys = $turkeyModel->getTurkeys();
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository); 
+$turkeys = $controller->listTurkeys();
+
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
+    if ($controller->removeTurkey($id)) {
+        header("Location: index.php");
+        exit();
+    } else {
+        echo "<script>alert('Error deleting turkey.');</script>";
+    }
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,7 +84,9 @@ $turkeys = $turkeyModel->getTurkeys();
                             </td>
                             <td>
                                 <a href="edit.php?id=<?= $turkey['id'] ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                <a href="delete.php?id=<?= $turkey['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this turkey?')"><i class="fas fa-trash"></i> Delete</a>
+                               
+                                <a href="index.php?delete=<?= $turkey['id'] ?>" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+
                                 <button class="btn btn-info btn-sm" onclick="confirmSaveToFile(<?= $turkey['id'] ?>)">
                                     <i class="fas fa-save"></i> Save to File
                                 </button>

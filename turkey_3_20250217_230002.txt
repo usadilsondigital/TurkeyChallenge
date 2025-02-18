@@ -1,8 +1,0 @@
-{
-    "id": 3,
-    "name": "numero23",
-    "status": "limbo",
-    "size": 13,
-    "color": "verde3",
-    "gender": "male"
-}

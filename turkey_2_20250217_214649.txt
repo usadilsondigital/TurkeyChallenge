@@ -1,8 +1,0 @@
-{
-    "id": 2,
-    "name": "numero2",
-    "status": "offline",
-    "size": 1,
-    "color": "verde",
-    "gender": "male"
-}

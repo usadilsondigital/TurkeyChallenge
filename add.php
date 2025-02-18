@@ -1,14 +1,17 @@
-<?php 
-require 'db.php';
-require 'Turkey.php';
+<?php
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
 
-$turkeyModel = new Turkey($pdo);
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $turkeyModel->addTurkey($_POST['name'], $_POST['status'], $_POST['size'], $_POST['color'], $_POST['gender']);
+    $controller->createTurkey($_POST['name'], $_POST['status'], $_POST['size'], $_POST['color'], $_POST['gender']);
     header("Location: index.php");
+    exit();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -69,6 +72,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

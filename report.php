@@ -1,9 +1,28 @@
 <?php
-require 'db.php';
-require 'Turkey.php';
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
 
-$turkeyModel = new Turkey($pdo);
-$report = $turkeyModel->generateReport();
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository);
+
+$report = $controller->getAllTurkeysOrder();
+
+// Count statuses
+$onlineCount = 0;
+$offlineCount = 0;
+$limboCount = 0;
+
+foreach ($report as $row) {
+    if ($row['status'] == 'online') {
+        $onlineCount++;
+    } elseif ($row['status'] == 'offline') {
+        $offlineCount++;
+    } else {
+        $limboCount++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +38,34 @@ $report = $turkeyModel->generateReport();
 <body class="bg-light">
     <div class="container mt-5">
         <h2 class="text-primary"><i class="fas fa-chart-bar"></i> Turkey Status Report</h2>
+
+        <!-- Status Tiles -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-success shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Onlines</h5>
+                        <p class="card-text display-6"> <?= $onlineCount ?> </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-secondary shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Offlines</h5>
+                        <p class="card-text display-6"> <?= $offlineCount ?> </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-dark bg-warning shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Limbos</h5>
+                        <p class="card-text display-6"> <?= $limboCount ?> </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Table displaying turkey statuses -->
         <div class="card shadow-sm">
@@ -58,6 +105,5 @@ $report = $turkeyModel->generateReport();
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

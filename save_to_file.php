@@ -1,14 +1,17 @@
 <?php
-require 'db.php';
-require 'Turkey.php';
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
 
-$turkeyModel = new Turkey($pdo);
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository);
 
 if (isset($_GET['id'])) {
-    $turkey = $turkeyModel->getTurkey($_GET['id']);
+    $turkey = $controller->listTurkeys()[array_search($_GET['id'], array_column($controller->listTurkeys(), 'id'))] ?? null;
 
     if ($turkey) {
-        $filename = "turkey_{$turkey['id']}_" . date("Ymd_His") . ".txt";
+        $filename = "turkey_{$turkey['id']}" . date("Ymd_His") . ".txt";
         $data = json_encode($turkey, JSON_PRETTY_PRINT);
 
         if (file_put_contents($filename, $data)) {

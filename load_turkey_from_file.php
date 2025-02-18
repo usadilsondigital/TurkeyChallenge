@@ -1,10 +1,14 @@
 <?php
-require 'db.php';
-require 'Turkey.php';
+require 'Database.php';
+require 'TurkeyRepository.php';
+require 'TurkeyController.php';
+
+$db = Database::getInstance();
+$repository = new TurkeyRepository($db);
+$controller = new TurkeyController($repository);
 
 // Load available turkey files
 $files = glob("turkey_*.txt");
-$turkeyModel = new Turkey($pdo);
 $turkey = null;
 
 // Handle file selection and loading
@@ -58,6 +62,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['load_file'])) {
             xhr.send(data);
         }
     </script>
+    <script>
+        function validateForm() {
+            let select = document.getElementById("selected_file");
+            let errorMessage = document.getElementById("error-message");
+
+            if (select.value === "") {
+                errorMessage.style.display = "block";
+                return false;
+            }
+
+            errorMessage.style.display = "none";
+            return true;
+        }
+</script>
 </head>
 <body class="bg-light">
     <div class="container mt-5">
@@ -68,17 +86,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['load_file'])) {
 
         <!-- File selection form -->
         <div class="card p-4 shadow-sm">
-            <form method="post">
+        <form method="post" onsubmit="return validateForm()">
                 <div class="mb-3">
                     <label class="form-label">Select a turkey file:</label>
                     <div class="input-group">
-                        <select class="form-select" name="selected_file">
+                        <select class="form-select" name="selected_file" id="selected_file">
+                            <option value="">-- Select a file --</option>
                             <?php foreach ($files as $file): ?>
                                 <option value="<?= $file ?>"><?= $file ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="submit" name="load_file" class="btn btn-primary"><i class="fas fa-upload"></i> Load Turkey</button>
+                        <button type="submit" name="load_file" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Load Turkey
+                        </button>
                     </div>
+                    <small id="error-message" class="text-danger" style="display: none;">Please select a turkey file.</small>
                 </div>
             </form>
         </div>
